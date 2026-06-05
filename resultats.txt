@@ -1,0 +1,44 @@
+mot	score	position	status
+action	48.76	982	Tiede.
+action	48.76	982	Tiede.
+organisation	41.83	929	Tiede.
+stratégie	38.85	889	Tiede.
+organiser	38.54	885	Tiede.
+ponctuel	26.37	485	Tiede.
+sportif	25.27	413	Tiede.
+métier	24.88	383	Froid.
+évènementiel	24.62	370	Froid.
+sport	17.87		Froid.
+compétition	16.09		Froid.
+profession	14.68		Froid.
+organisateur	13.11		Froid.
+évènement	10.78		Froid.
+artiste	9.3		Froid.
+délai	5.94		Froid.
+art	4.39		Froid.
+art	4.39		Froid.
+acte	3.91		Froid.
+notation	1.7		Froid.
+puissance	0.13		Froid.
+passion	-1.67		Froid.
+maison	-2.54		Froid.
+maison	-2.54		Froid.
+passionnant	-3.45		Froid.
+résumer	-4.67		Froid.
+écrivain	-6.6		Froid.
+isolé	-6.97		Froid.
+plaisir	-8.9		Froid.
+exil	-9.01		Froid.
+guerre	-11.67		Froid.
+chat	-13.53		Froid.
+salut	-14.51		Froid.
+salut	-14.51		Froid.
+homme	-15.77		Froid.
+attaque	-17.18		Froid.
+boule	-19.13		Froid.
+lune	-19.56		Froid.
+soleil	-20.57		Froid.
+ranger	-26.83		Froid.
+résultats			Mot inconnu
+occurence			Mot inconnu
+professionmétier			Mot inconnu
