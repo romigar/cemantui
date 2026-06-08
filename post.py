@@ -9,10 +9,30 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
-from rich import color
 from rich.console import Console
 
 console = Console()
+
+
+def style_for_proximite(proximite: float) -> tuple[str, str]:
+    if proximite >= 100:
+        return "green", "Trouve !"
+    if proximite >= 35:
+        return "red1", "Tres chaud !"
+    if proximite >= 30:
+        return "red", "Tres chaud !"
+    if proximite >= 25:
+        return "orange3", "Tiede."
+    if proximite >= 20:
+        return "yellow", "Tiede."
+    return "cyan", "Froid."
+
+
+def result_style(result: dict) -> str:
+    score = result.get("score")
+    if score is not None:
+        return style_for_proximite(score)[0]
+    return ""
 
 
 def day_number(cemantle: bool) -> int:
@@ -173,19 +193,7 @@ def post_word(mot: str, cemantle: bool) -> tuple[int, dict]:
 
         console.print(f"Mot : {mot}", style="bold")
 
-        if score >= 1.0:
-            style = "green"
-            text = "Trouve !"
-        elif score >= 0.5:
-            style = "red"
-            text = "Tres chaud !"
-        elif score >= 0.25:
-            style = "orange3"
-            text = "Tiede."
-        else:
-            style = "cyan"
-            text = "Froid."
-
+        style, text = style_for_proximite(proximite)
         result["status"] = text
 
         console.print(f"Score : {proximite}", style=style)
