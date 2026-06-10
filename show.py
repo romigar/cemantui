@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -10,7 +11,7 @@ from rich.table import Table
 from post import RESULTS_FILE, RESULTS_HEADER, RESULTS_META, parse_result_line, result_style
 
 console = Console()
-
+sys.stdout.reconfigure(encoding="utf-8")
 
 def read_meta_details() -> tuple[int | None, bool | None, int | None]:
     if not RESULTS_META.is_file():
