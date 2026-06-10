@@ -20,12 +20,14 @@ def style_for_proximite(proximite: float) -> tuple[str, str]:
     if proximite >= 35:
         return "red1", "Tres chaud !"
     if proximite >= 30:
-        return "red", "Tres chaud !"
+        return "red", "Chaud"
     if proximite >= 25:
-        return "orange3", "Tiede."
+        return "orange3", "Tiede"
     if proximite >= 20:
-        return "yellow", "Tiede."
-    return "cyan", "Froid."
+        return "yellow", "Tiede"
+    if proximite >= 0:
+        return "cyan", "Froid"
+    return "bright_cyan", "Très Froid"
 
 
 def result_style(result: dict) -> str:
@@ -196,7 +198,7 @@ def post_word(mot: str, cemantle: bool) -> tuple[int, dict]:
         style, text = style_for_proximite(proximite)
         result["status"] = text
 
-        console.print(f"Score : {proximite}", style=style)
+        console.print(f"Score : {proximite} °C", style=style)
         console.print(text, style=style)
         if position is not None:
             console.print(f"Position : {position}", style=style)
