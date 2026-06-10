@@ -8,15 +8,16 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
-from post import RESULTS_FILE, RESULTS_HEADER, RESULTS_META, parse_result_line, result_style
+from post import RESULTS_HEADER, parse_result_line, result_style, results_paths
 
 console = Console()
 sys.stdout.reconfigure(encoding="utf-8")
 
-def read_meta_details() -> tuple[int | None, bool | None, int | None]:
-    if not RESULTS_META.is_file():
+def read_meta_details(cemantle: bool) -> tuple[int | None, bool | None, int | None]:
+    _, meta_file = results_paths(cemantle)
+    if not meta_file.is_file():
         return None, None, None
-    lines = RESULTS_META.read_text(encoding="utf-8").splitlines()
+    lines = meta_file.read_text(encoding="utf-8").splitlines()
     if not lines:
         return None, None, None
     day = int(lines[0])
@@ -31,9 +32,9 @@ def main() -> None:
         "-f",
         "--file",
         type=Path,
-        default=RESULTS_FILE,
-        help="Fichier de resultats (defaut: resultats.txt)",
+        help="Fichier de resultats (defaut: resultats.txt ou resultats_cemantle.txt)",
     )
+    parser.add_argument("--cemantle", action="store_true", help="Afficher les resultats Cemantle")
     parser.add_argument(
         "-n",
         "--limit",
@@ -43,17 +44,19 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if not args.file.is_file():
-        print(f"Fichier introuvable : {args.file}", file=sys.stderr)
+    results_file = args.file if args.file else results_paths(args.cemantle)[0]
+
+    if not results_file.is_file():
+        print(f"Fichier introuvable : {results_file}", file=sys.stderr)
         sys.exit(1)
 
-    results = load_results_from(args.file)
+    results = load_results_from(results_file)
     if not results:
         console.print("Aucun resultat.", style="yellow")
         sys.exit(0)
 
-    day, cemantle, line_count = read_meta_details()
-    game = "Cemantle" if cemantle else "Cemantix"
+    day, _, line_count = read_meta_details(args.cemantle)
+    game = "Cemantle" if args.cemantle else "Cemantix"
 
     if day is not None:
         console.print(f"{game} - jour #{day}", style="bold")
@@ -68,7 +71,7 @@ def main() -> None:
     else:
         console.print(f"{total} proposition(s)", style="dim")
     if line_count is not None:
-        console.print(f"{line_count} ligne(s) dans {args.file.name}", style="dim")
+        console.print(f"{line_count} ligne(s) dans {results_file.name}", style="dim")
     console.print()
 
     table = Table(show_header=True, header_style="bold")

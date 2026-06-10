@@ -59,40 +59,51 @@ def load_words(path: Path) -> list[str]:
 
 RESULTS_FILE = Path("resultats.txt")
 RESULTS_META = Path("resultats.meta")
+RESULTS_FILE_CEMANTLE = Path("resultats_cemantle.txt")
+RESULTS_META_CEMANTLE = Path("resultats_cemantle.meta")
 RESULTS_HEADER = "mot\tscore\tposition\tstatus"
 
 
-def read_results_meta() -> tuple[int | None, bool | None]:
-    if not RESULTS_META.is_file():
+def results_paths(cemantle: bool) -> tuple[Path, Path]:
+    if cemantle:
+        return RESULTS_FILE_CEMANTLE, RESULTS_META_CEMANTLE
+    return RESULTS_FILE, RESULTS_META
+
+
+def read_results_meta(cemantle: bool = False) -> tuple[int | None, bool | None]:
+    _, meta_file = results_paths(cemantle)
+    if not meta_file.is_file():
         return None, None
-    lines = RESULTS_META.read_text(encoding="utf-8").splitlines()
+    lines = meta_file.read_text(encoding="utf-8").splitlines()
     if not lines:
         return None, None
     day = int(lines[0])
-    cemantle = len(lines) > 1 and lines[1].lower() == "true"
-    return day, cemantle
+    stored_cemantle = len(lines) > 1 and lines[1].lower() == "true"
+    return day, stored_cemantle
 
 
-def count_results_lines() -> int:
-    if not RESULTS_FILE.is_file():
+def count_results_lines(cemantle: bool) -> int:
+    results_file, _ = results_paths(cemantle)
+    if not results_file.is_file():
         return 0
-    return len(RESULTS_FILE.read_text(encoding="utf-8").splitlines())
+    return len(results_file.read_text(encoding="utf-8").splitlines())
 
 
 def write_results_meta(day: int, cemantle: bool) -> None:
-    line_count = count_results_lines()
-    RESULTS_META.write_text(f"{day}\n{cemantle}\n{line_count}\n", encoding="utf-8")
+    _, meta_file = results_paths(cemantle)
+    line_count = count_results_lines(cemantle)
+    meta_file.write_text(f"{day}\n{cemantle}\n{line_count}\n", encoding="utf-8")
 
 
 def ensure_results_file(day: int, cemantle: bool) -> None:
-    stored_day, stored_cemantle = read_results_meta()
+    results_file, _ = results_paths(cemantle)
+    stored_day, _ = read_results_meta(cemantle)
     if (
         stored_day != day
-        or stored_cemantle != cemantle
-        or not RESULTS_FILE.is_file()
-        or RESULTS_FILE.stat().st_size == 0
+        or not results_file.is_file()
+        or results_file.stat().st_size == 0
     ):
-        RESULTS_FILE.write_text(RESULTS_HEADER + "\n", encoding="utf-8")
+        results_file.write_text(RESULTS_HEADER + "\n", encoding="utf-8")
         write_results_meta(day, cemantle)
 
 
@@ -110,10 +121,11 @@ def parse_result_line(line: str) -> dict:
     }
 
 
-def load_results() -> list[dict]:
-    if not RESULTS_FILE.is_file():
+def load_results(cemantle: bool = False) -> list[dict]:
+    results_file, _ = results_paths(cemantle)
+    if not results_file.is_file():
         return []
-    lines = RESULTS_FILE.read_text(encoding="utf-8").splitlines()
+    lines = results_file.read_text(encoding="utf-8").splitlines()
     if not lines:
         return []
     data_lines = lines[1:] if lines[0] == RESULTS_HEADER else lines
@@ -121,14 +133,15 @@ def load_results() -> list[dict]:
 
 
 def write_results(results: list[dict], day: int, cemantle: bool) -> None:
+    results_file, _ = results_paths(cemantle)
     lines = [RESULTS_HEADER, *[format_result_line(r) for r in results]]
-    RESULTS_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    results_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
     write_results_meta(day, cemantle)
 
 
 def append_result(result: dict, day: int, cemantle: bool) -> None:
     ensure_results_file(day, cemantle)
-    results = load_results()
+    results = load_results(cemantle)
     results.append(result)
     results.sort(
         key=lambda r: r["score"] if r["score"] is not None else float("-inf"),
